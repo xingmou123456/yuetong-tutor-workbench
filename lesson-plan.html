@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>教案生成 · 月瞳家教工作台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="lesson-plan">
+  <!-- App Shell: Sidebar -->
+  <aside class="app-nav">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">月瞳家教</div>
+        <div class="brand-subtitle">AI 家教工作台</div>
+      </div>
+    </div>
+    <nav class="nav-list" aria-label="主导航">
+      <a href="index.html" data-nav="dashboard"><span class="nav-icon" data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span class="nav-icon" data-icon="users"></span>学生档案</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span class="nav-icon" data-icon="book-open"></span>教案生成</a>
+      <a href="homework.html" data-nav="homework"><span class="nav-icon" data-icon="file-text"></span>作业生成</a>
+      <a href="report.html" data-nav="report"><span class="nav-icon" data-icon="trending-up"></span>学习报告</a>
+    </nav>
+    <div class="nav-footer">MVP v1.0 · 离线原型</div>
+  </aside>
+
+  <!-- App Shell: Bottom Nav (mobile) -->
+  <nav class="bottom-nav" aria-label="底部导航">
+    <div class="bottom-nav-inner">
+      <a href="index.html" data-nav="dashboard"><span data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span data-icon="users"></span>学生</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span data-icon="book-open"></span>教案</a>
+      <a href="homework.html" data-nav="homework"><span data-icon="file-text"></span>作业</a>
+      <a href="report.html" data-nav="report"><span data-icon="trending-up"></span>报告</a>
+    </div>
+  </nav>
+
+  <main class="app-content">
+    <div class="container">
+      <header class="page-header animate-fade-up">
+        <div>
+          <h1 class="page-title">AI 教案生成器</h1>
+          <p class="page-desc">选择学生、输入知识点，AI 将生成包含目标、讲解、例题、互动和作业的完整教案。</p>
+        </div>
+      </header>
+
+      <div class="page-layout">
+        <!-- Left: Form + History -->
+        <aside class="animate-fade-up stagger-1">
+          <div class="card" style="margin-bottom: 20px;">
+            <div class="card-body">
+              <h2 class="card-title mb-16">生成设置</h2>
+              <div class="form-group">
+                <label class="form-label" for="lp-student">选择学生</label>
+                <select id="lp-student" class="select">
+                  <option value="">请选择学生</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="lp-topic">知识点 / 课题</label>
+                <input type="text" id="lp-topic" class="input" placeholder="例如：一元一次方程行程问题">
+              </div>
+              <button class="btn btn-primary w-full" id="generate-btn" onclick="generatePlan()">
+                <span data-icon="sparkles"></span>生成教案
+              </button>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <h2 class="card-title">历史教案</h2>
+            </div>
+            <div class="card-body" id="history-list">
+              <div class="text-muted text-center" style="font-size: 13px; padding: 16px 0;">暂无历史教案</div>
+            </div>
+          </div>
+        </aside>
+
+        <!-- Right: Editor / Preview -->
+        <section class="card animate-fade-up stagger-2" id="editor-card">
+          <div class="card-header">
+            <h2 class="card-title" id="editor-title">教案预览</h2>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-ghost btn-sm" id="copy-btn" onclick="copyPlan()"><span data-icon="copy"></span>复制</button>
+              <button class="btn btn-primary btn-sm" id="save-btn" onclick="savePlan()"><span data-icon="save"></span>保存</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="empty-editor">
+              <div class="empty-state">
+                <div class="empty-icon" data-icon="book-open"></div>
+                <div class="empty-title">开始生成教案</div>
+                <div class="empty-desc">在左侧选择学生并输入知识点，点击「生成教案」即可查看结果。</div>
+              </div>
+            </div>
+
+            <div id="loading-editor" class="hidden">
+              <div class="loading-state">
+                <div class="loader"></div>
+                <div>AI 正在备课，请稍候...</div>
+              </div>
+            </div>
+
+            <div id="plan-editor" class="hidden">
+              <input type="hidden" id="plan-id">
+              <div class="form-group">
+                <label class="form-label">课题</label>
+                <input type="text" id="plan-topic" class="input">
+              </div>
+              <div class="form-group">
+                <label class="form-label">教学目标</label>
+                <textarea id="plan-objectives" class="textarea" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">知识点讲解</label>
+                <textarea id="plan-explanation" class="textarea" rows="5"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">典型例题</label>
+                <textarea id="plan-examples" class="textarea" rows="5"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">互动设计</label>
+                <textarea id="plan-interaction" class="textarea" rows="3"></textarea>
+              </div>
+              <div class="form-group">
+                <label class="form-label">课后作业</label>
+                <textarea id="plan-homework" class="textarea" rows="3"></textarea>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      document.querySelectorAll('[data-icon]').forEach((el) => {
+        const name = el.dataset.icon;
+        const svg = window.YTIcon(name);
+        if (svg) el.innerHTML = svg;
+      });
+
+      let currentPlan = null;
+
+      function populateStudents() {
+        const select = document.getElementById('lp-student');
+        select.innerHTML = '<option value="">请选择学生</option>' +
+          window.YTData.DB.students.map((s) => `<option value="${s.id}">${s.name} · ${s.grade}${s.subject}</option>`).join('');
+      }
+
+      function renderHistory() {
+        const list = document.getElementById('history-list');
+        const plans = window.YTData.DB.lessonPlans;
+        if (!plans.length) {
+          list.innerHTML = '<div class="text-muted text-center" style="font-size: 13px; padding: 16px 0;">暂无历史教案</div>';
+          return;
+        }
+        list.innerHTML = plans.map((p) => `
+          <div style="padding: 12px 0; border-bottom: 1px solid var(--divider); cursor: pointer;" onclick="loadPlan('${p.id}')">
+            <div class="font-medium" style="font-size: 13px; margin-bottom: 4px;">${p.topic}</div>
+            <div class="text-sub" style="font-size: 12px;">${p.studentName} · ${p.createdAt}</div>
+          </div>
+        `).join('');
+      }
+
+      window.generatePlan = async function () {
+        const studentId = document.getElementById('lp-student').value;
+        const topic = document.getElementById('lp-topic').value.trim();
+        if (!studentId || !topic) {
+          window.YTToast('请选择学生并输入知识点', 'error');
+          return;
+        }
+        document.getElementById('empty-editor').classList.add('hidden');
+        document.getElementById('plan-editor').classList.add('hidden');
+        document.getElementById('loading-editor').classList.remove('hidden');
+
+        const res = await window.YTApi.generateLessonPlan({ studentId, topic });
+        currentPlan = res.data;
+        fillEditor(currentPlan);
+
+        document.getElementById('loading-editor').classList.add('hidden');
+        document.getElementById('plan-editor').classList.remove('hidden');
+      };
+
+      function fillEditor(plan) {
+        document.getElementById('plan-id').value = plan.id;
+        document.getElementById('plan-topic').value = plan.topic;
+        document.getElementById('plan-objectives').value = plan.objectives;
+        document.getElementById('plan-explanation').value = plan.explanation;
+        document.getElementById('plan-examples').value = plan.examples;
+        document.getElementById('plan-interaction').value = plan.interaction;
+        document.getElementById('plan-homework').value = plan.homework;
+        document.getElementById('editor-title').textContent = `${plan.studentName} · ${plan.topic}`;
+      }
+
+      window.loadPlan = function (id) {
+        const plan = window.YTData.DB.lessonPlans.find((p) => p.id === id);
+        if (!plan) return;
+        currentPlan = plan;
+        document.getElementById('empty-editor').classList.add('hidden');
+        document.getElementById('loading-editor').classList.add('hidden');
+        fillEditor(plan);
+        document.getElementById('plan-editor').classList.remove('hidden');
+      };
+
+      window.savePlan = async function () {
+        if (!currentPlan) return;
+        const plan = {
+          ...currentPlan,
+          topic: document.getElementById('plan-topic').value,
+          objectives: document.getElementById('plan-objectives').value,
+          explanation: document.getElementById('plan-explanation').value,
+          examples: document.getElementById('plan-examples').value,
+          interaction: document.getElementById('plan-interaction').value,
+          homework: document.getElementById('plan-homework').value
+        };
+        await window.YTApi.saveLessonPlan(plan);
+        window.YTToast('教案已保存');
+        renderHistory();
+      };
+
+      window.copyPlan = function () {
+        if (!currentPlan) return;
+        const text = [
+          `课题：${currentPlan.topic}`,
+          `学生：${currentPlan.studentName}`,
+          `教学目标：\n${currentPlan.objectives}`,
+          `知识点讲解：\n${currentPlan.explanation}`,
+          `典型例题：\n${currentPlan.examples}`,
+          `互动设计：\n${currentPlan.interaction}`,
+          `课后作业：\n${currentPlan.homework}`
+        ].join('\n\n');
+        window.YTCopy(text);
+      };
+
+      // Pre-load plan from URL ?id=xxx
+      const params = new URLSearchParams(location.search);
+      const planId = params.get('id');
+      if (planId) {
+        setTimeout(() => window.loadPlan(planId), 0);
+      }
+
+      populateStudents();
+      renderHistory();
+    })();
+  </script>
+</body>
+</html>

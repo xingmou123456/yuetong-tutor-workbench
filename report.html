@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>学习报告 · 月瞳家教工作台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="report">
+  <!-- App Shell: Sidebar -->
+  <aside class="app-nav">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">月瞳家教</div>
+        <div class="brand-subtitle">AI 家教工作台</div>
+      </div>
+    </div>
+    <nav class="nav-list" aria-label="主导航">
+      <a href="index.html" data-nav="dashboard"><span class="nav-icon" data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span class="nav-icon" data-icon="users"></span>学生档案</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span class="nav-icon" data-icon="book-open"></span>教案生成</a>
+      <a href="homework.html" data-nav="homework"><span class="nav-icon" data-icon="file-text"></span>作业生成</a>
+      <a href="report.html" data-nav="report"><span class="nav-icon" data-icon="trending-up"></span>学习报告</a>
+    </nav>
+    <div class="nav-footer">MVP v1.0 · 离线原型</div>
+  </aside>
+
+  <!-- App Shell: Bottom Nav (mobile) -->
+  <nav class="bottom-nav" aria-label="底部导航">
+    <div class="bottom-nav-inner">
+      <a href="index.html" data-nav="dashboard"><span data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span data-icon="users"></span>学生</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span data-icon="book-open"></span>教案</a>
+      <a href="homework.html" data-nav="homework"><span data-icon="file-text"></span>作业</a>
+      <a href="report.html" data-nav="report"><span data-icon="trending-up"></span>报告</a>
+    </div>
+  </nav>
+
+  <main class="app-content">
+    <div class="container">
+      <header class="page-header animate-fade-up">
+        <div>
+          <h1 class="page-title">学习报告生成</h1>
+          <p class="page-desc">选择学生与时间段，AI 自动汇总课后反馈，生成阶段学习报告。</p>
+        </div>
+      </header>
+
+      <div class="page-layout sidebar-narrow">
+        <aside class="animate-fade-up stagger-1">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title mb-16">报告参数</h2>
+              <div class="form-group">
+                <label class="form-label" for="rpt-student">选择学生</label>
+                <select id="rpt-student" class="select">
+                  <option value="">请选择学生</option>
+                </select>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <div class="form-group">
+                  <label class="form-label" for="rpt-start">开始日期</label>
+                  <input type="date" id="rpt-start" class="input">
+                </div>
+                <div class="form-group">
+                  <label class="form-label" for="rpt-end">结束日期</label>
+                  <input type="date" id="rpt-end" class="input">
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" id="generate-rpt-btn" onclick="generateReport()">
+                <span data-icon="sparkles"></span>生成报告
+              </button>
+            </div>
+          </div>
+
+          <div class="card mt-16">
+            <div class="card-header">
+              <h2 class="card-title">历史报告</h2>
+            </div>
+            <div class="card-body" id="report-history">
+              <div class="text-muted text-center" style="font-size: 13px; padding: 16px 0;">暂无历史报告</div>
+            </div>
+          </div>
+        </aside>
+
+        <section class="card animate-fade-up stagger-2" id="report-card">
+          <div class="card-header">
+            <h2 class="card-title" id="report-title">报告预览</h2>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-ghost btn-sm" onclick="printReport()"><span data-icon="printer"></span>打印 / PDF</button>
+              <button class="btn btn-primary btn-sm" onclick="exportWord()"><span data-icon="download"></span>导出 Word</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="empty-report">
+              <div class="empty-state">
+                <div class="empty-icon" data-icon="trending-up"></div>
+                <div class="empty-title">开始生成报告</div>
+                <div class="empty-desc">在左侧选择学生与时间段，点击「生成报告」查看阶段总结。</div>
+              </div>
+            </div>
+
+            <div id="loading-report" class="hidden">
+              <div class="loading-state">
+                <div class="loader"></div>
+                <div>AI 正在汇总数据，请稍候...</div>
+              </div>
+            </div>
+
+            <div id="report-result" class="hidden">
+              <div id="printable-report" style="line-height: 1.8; color: var(--text);">
+                <div style="text-align: center; margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--primary);">
+                  <h2 style="font-size: 24px; margin-bottom: 8px; color: var(--text);">阶段学习报告</h2>
+                  <div style="color: var(--text-sub); font-size: 14px;">
+                    <span id="rpt-print-student"></span> · <span id="rpt-print-range"></span>
+                  </div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><span data-icon="bookmark"></span>学习内容</h3>
+                  <div id="rpt-content" style="background: var(--surface-elevated); border-radius: var(--radius-md); padding: 16px; font-size: 14px;"></div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <h3 style="font-size: 16px; color: var(--success); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><span data-icon="award"></span>进步亮点</h3>
+                  <div id="rpt-highlights" style="background: var(--success-soft); border-radius: var(--radius-md); padding: 16px; font-size: 14px;"></div>
+                </div>
+
+                <div style="margin-bottom: 24px;">
+                  <h3 style="font-size: 16px; color: var(--warning); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><span data-icon="target"></span>待提升方向</h3>
+                  <div id="rpt-improvements" style="background: var(--warning-soft); border-radius: var(--radius-md); padding: 16px; font-size: 14px;"></div>
+                </div>
+
+                <div>
+                  <h3 style="font-size: 16px; color: var(--primary); margin-bottom: 10px; display: flex; align-items: center; gap: 8px;"><span data-icon="calendar"></span>下一步计划</h3>
+                  <div id="rpt-next" style="background: var(--surface-elevated); border-radius: var(--radius-md); padding: 16px; font-size: 14px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      document.querySelectorAll('[data-icon]').forEach((el) => {
+        const name = el.dataset.icon;
+        const svg = window.YTIcon(name);
+        if (svg) el.innerHTML = svg;
+      });
+
+      let currentReport = null;
+
+      function populateStudents() {
+        const select = document.getElementById('rpt-student');
+        select.innerHTML = '<option value="">请选择学生</option>' +
+          window.YTData.DB.students.map((s) => `<option value="${s.id}">${s.name} · ${s.grade}${s.subject}</option>`).join('');
+      }
+
+      function setDefaultDates() {
+        const end = new Date();
+        const start = new Date();
+        start.setDate(start.getDate() - 7);
+        document.getElementById('rpt-end').value = end.toISOString().slice(0, 10);
+        document.getElementById('rpt-start').value = start.toISOString().slice(0, 10);
+      }
+
+      function renderHistory() {
+        const list = document.getElementById('report-history');
+        const reports = window.YTData.DB.reports;
+        if (!reports.length) {
+          list.innerHTML = '<div class="text-muted text-center" style="font-size: 13px; padding: 16px 0;">暂无历史报告</div>';
+          return;
+        }
+        list.innerHTML = reports.map((r) => `
+          <div style="padding: 12px 0; border-bottom: 1px solid var(--divider); cursor: pointer;" onclick="loadReport('${r.id}')">
+            <div class="font-medium" style="font-size: 13px; margin-bottom: 4px;">${r.studentName}</div>
+            <div class="text-sub" style="font-size: 12px;">${r.startDate} 至 ${r.endDate}</div>
+          </div>
+        `).join('');
+      }
+
+      window.generateReport = async function () {
+        const studentId = document.getElementById('rpt-student').value;
+        const startDate = document.getElementById('rpt-start').value;
+        const endDate = document.getElementById('rpt-end').value;
+        if (!studentId || !startDate || !endDate) {
+          window.YTToast('请选择学生与时间段', 'error');
+          return;
+        }
+        if (startDate > endDate) {
+          window.YTToast('开始日期不能晚于结束日期', 'error');
+          return;
+        }
+
+        document.getElementById('empty-report').classList.add('hidden');
+        document.getElementById('report-result').classList.add('hidden');
+        document.getElementById('loading-report').classList.remove('hidden');
+
+        const res = await window.YTApi.generateReport({ studentId, startDate, endDate });
+        currentReport = res.data;
+        fillReport(currentReport);
+
+        document.getElementById('loading-report').classList.add('hidden');
+        document.getElementById('report-result').classList.remove('hidden');
+        renderHistory();
+      };
+
+      function fillReport(r) {
+        document.getElementById('report-title').textContent = `${r.studentName} 的阶段报告`;
+        document.getElementById('rpt-print-student').textContent = r.studentName;
+        document.getElementById('rpt-print-range').textContent = `${r.startDate} 至 ${r.endDate}`;
+        document.getElementById('rpt-content').textContent = r.content;
+        document.getElementById('rpt-highlights').textContent = r.highlights;
+        document.getElementById('rpt-improvements').textContent = r.improvements;
+        document.getElementById('rpt-next').textContent = r.nextPlan;
+      }
+
+      window.loadReport = function (id) {
+        const r = window.YTData.DB.reports.find((x) => x.id === id);
+        if (!r) return;
+        currentReport = r;
+        document.getElementById('empty-report').classList.add('hidden');
+        document.getElementById('loading-report').classList.add('hidden');
+        fillReport(r);
+        document.getElementById('report-result').classList.remove('hidden');
+      };
+
+      window.printReport = function () {
+        if (!currentReport) return;
+        const printWindow = window.open('', '_blank');
+        const html = document.getElementById('printable-report').outerHTML;
+        printWindow.document.write(`
+          <html><head><meta charset="utf-8"><title>学习报告</title>
+          <style>body{font-family:PingFang SC,Microsoft YaHei,sans-serif;line-height:1.8;color:#2D2420;max-width:720px;margin:40px auto;padding:0 20px;}h2{color:#D97757;}h3{color:#2D2420;}</style>
+          </head><body>${html}</body></html>
+        `);
+        printWindow.document.close();
+        printWindow.focus();
+        setTimeout(() => { printWindow.print(); }, 300);
+      };
+
+      window.exportWord = function () {
+        if (!currentReport) return;
+        const html = `
+          <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+          <head><meta charset='utf-8'><title>学习报告</title></head>
+          <body>
+            <h2>${currentReport.studentName} 阶段学习报告</h2>
+            <p>时间：${currentReport.startDate} 至 ${currentReport.endDate}</p>
+            <h3>学习内容</h3><p>${currentReport.content}</p>
+            <h3>进步亮点</h3><p>${currentReport.highlights}</p>
+            <h3>待提升方向</h3><p>${currentReport.improvements}</p>
+            <h3>下一步计划</h3><p>${currentReport.nextPlan}</p>
+          </body></html>
+        `;
+        window.YTDownload(html, `${currentReport.studentName}_学习报告.doc`, 'application/msword;charset=utf-8');
+        window.YTToast('Word 报告已导出');
+      };
+
+      populateStudents();
+      setDefaultDates();
+      renderHistory();
+    })();
+  </script>
+</body>
+</html>

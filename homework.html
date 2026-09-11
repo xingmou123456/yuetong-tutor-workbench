@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>作业生成 · 月瞳家教工作台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="homework">
+  <!-- App Shell: Sidebar -->
+  <aside class="app-nav">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">月瞳家教</div>
+        <div class="brand-subtitle">AI 家教工作台</div>
+      </div>
+    </div>
+    <nav class="nav-list" aria-label="主导航">
+      <a href="index.html" data-nav="dashboard"><span class="nav-icon" data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span class="nav-icon" data-icon="users"></span>学生档案</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span class="nav-icon" data-icon="book-open"></span>教案生成</a>
+      <a href="homework.html" data-nav="homework"><span class="nav-icon" data-icon="file-text"></span>作业生成</a>
+      <a href="report.html" data-nav="report"><span class="nav-icon" data-icon="trending-up"></span>学习报告</a>
+    </nav>
+    <div class="nav-footer">MVP v1.0 · 离线原型</div>
+  </aside>
+
+  <!-- App Shell: Bottom Nav (mobile) -->
+  <nav class="bottom-nav" aria-label="底部导航">
+    <div class="bottom-nav-inner">
+      <a href="index.html" data-nav="dashboard"><span data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span data-icon="users"></span>学生</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span data-icon="book-open"></span>教案</a>
+      <a href="homework.html" data-nav="homework"><span data-icon="file-text"></span>作业</a>
+      <a href="report.html" data-nav="report"><span data-icon="trending-up"></span>报告</a>
+    </div>
+  </nav>
+
+  <main class="app-content">
+    <div class="container">
+      <header class="page-header animate-fade-up">
+        <div>
+          <h1 class="page-title">作业生成器</h1>
+          <p class="page-desc">选择知识点、难度与题型，AI 自动生成配套练习与答案解析。</p>
+        </div>
+      </header>
+
+      <div class="page-layout sidebar-narrow">
+        <aside class="animate-fade-up stagger-1">
+          <div class="card">
+            <div class="card-body">
+              <h2 class="card-title mb-16">作业配置</h2>
+              <div class="form-group">
+                <label class="form-label" for="hw-topic">知识点</label>
+                <input type="text" id="hw-topic" class="input" placeholder="例如：一元一次方程应用题">
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hw-difficulty">难度</label>
+                <select id="hw-difficulty" class="select">
+                  <option value="基础">基础</option>
+                  <option value="中等" selected>中等</option>
+                  <option value="提高">提高</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label" for="hw-count">题量</label>
+                <input type="number" id="hw-count" class="input" value="5" min="1" max="20">
+              </div>
+              <div class="form-group">
+                <label class="form-label">题型</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+                  <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" class="hw-type" value="选择题" checked> 选择题
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" class="hw-type" value="填空题" checked> 填空题
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; cursor: pointer;">
+                    <input type="checkbox" class="hw-type" value="解答题" checked> 解答题
+                  </label>
+                </div>
+              </div>
+              <button class="btn btn-primary w-full" id="generate-hw-btn" onclick="generateHomework()">
+                <span data-icon="sparkles"></span>生成作业
+              </button>
+            </div>
+          </div>
+        </aside>
+
+        <section class="card animate-fade-up stagger-2" id="homework-card">
+          <div class="card-header">
+            <h2 class="card-title" id="hw-title">作业预览</h2>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-ghost btn-sm" onclick="toggleAnswers()">
+                <span id="toggle-answer-icon" data-icon="bookmark"></span><span id="toggle-answer-text">显示答案</span>
+              </button>
+              <button class="btn btn-ghost btn-sm" onclick="copyHomework()"><span data-icon="copy"></span>复制</button>
+              <button class="btn btn-primary btn-sm" onclick="exportHomework()"><span data-icon="download"></span>导出</button>
+            </div>
+          </div>
+          <div class="card-body">
+            <div id="empty-homework">
+              <div class="empty-state">
+                <div class="empty-icon" data-icon="file-text"></div>
+                <div class="empty-title">开始生成作业</div>
+                <div class="empty-desc">在左侧配置知识点、难度、题量和题型，点击「生成作业」查看题目与解析。</div>
+              </div>
+            </div>
+
+            <div id="loading-homework" class="hidden">
+              <div class="loading-state">
+                <div class="loader"></div>
+                <div>AI 正在出题，请稍候...</div>
+              </div>
+            </div>
+
+            <div id="homework-result" class="hidden">
+              <div style="display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;">
+                <span class="tag tag-primary" id="hw-tag-topic"></span>
+                <span class="tag tag-warning" id="hw-tag-difficulty"></span>
+                <span class="tag tag-secondary" id="hw-tag-count"></span>
+              </div>
+              <div id="questions-list"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      document.querySelectorAll('[data-icon]').forEach((el) => {
+        const name = el.dataset.icon;
+        const svg = window.YTIcon(name);
+        if (svg) el.innerHTML = svg;
+      });
+
+      let currentHomework = null;
+      let showAnswers = false;
+
+      window.generateHomework = async function () {
+        const topic = document.getElementById('hw-topic').value.trim();
+        if (!topic) {
+          window.YTToast('请输入知识点', 'error');
+          return;
+        }
+        const difficulty = document.getElementById('hw-difficulty').value;
+        const count = parseInt(document.getElementById('hw-count').value, 10) || 5;
+        const types = Array.from(document.querySelectorAll('.hw-type:checked')).map((cb) => cb.value);
+        if (!types.length) {
+          window.YTToast('请至少选择一种题型', 'error');
+          return;
+        }
+
+        document.getElementById('empty-homework').classList.add('hidden');
+        document.getElementById('homework-result').classList.add('hidden');
+        document.getElementById('loading-homework').classList.remove('hidden');
+
+        const res = await window.YTApi.generateHomework({ topic, difficulty, count, types });
+        currentHomework = res.data;
+        showAnswers = false;
+        renderHomework();
+
+        document.getElementById('loading-homework').classList.add('hidden');
+        document.getElementById('homework-result').classList.remove('hidden');
+      };
+
+      function renderHomework() {
+        if (!currentHomework) return;
+        document.getElementById('hw-title').textContent = `${currentHomework.topic} · 作业`;
+        document.getElementById('hw-tag-topic').textContent = currentHomework.topic;
+        document.getElementById('hw-tag-difficulty').textContent = currentHomework.difficulty;
+        document.getElementById('hw-tag-count').textContent = `共 ${currentHomework.count} 题`;
+        document.getElementById('toggle-answer-text').textContent = showAnswers ? '隐藏答案' : '显示答案';
+
+        document.getElementById('questions-list').innerHTML = currentHomework.questions.map((q) => `
+          <div style="padding: 18px 0; border-bottom: 1px solid var(--divider);">
+            <div style="display: flex; gap: 10px; margin-bottom: 8px;">
+              <span class="tag tag-secondary">${q.type}</span>
+              <span class="text-muted" style="font-size: 13px;">第 ${q.number} 题</span>
+            </div>
+            <div style="font-size: 15px; color: var(--text); line-height: 1.7; margin-bottom: 12px;">${q.question}</div>
+            <div class="answer-block ${showAnswers ? '' : 'hidden'}" style="background: var(--surface-elevated); border-radius: var(--radius-md); padding: 14px;">
+              <div style="font-size: 13px; color: var(--success); font-weight: 600; margin-bottom: 6px;">答案</div>
+              <div style="font-size: 14px; color: var(--text); margin-bottom: 10px;">${q.answer}</div>
+              <div style="font-size: 13px; color: var(--primary); font-weight: 600; margin-bottom: 6px;">解析</div>
+              <div style="font-size: 14px; color: var(--text-sub); line-height: 1.6;">${q.analysis}</div>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      window.toggleAnswers = function () {
+        showAnswers = !showAnswers;
+        renderHomework();
+      };
+
+      window.copyHomework = function () {
+        if (!currentHomework) return;
+        const text = [
+          `${currentHomework.topic} 作业（${currentHomework.difficulty} · 共${currentHomework.count}题）`,
+          ...currentHomework.questions.map((q) => `\n第${q.number}题【${q.type}】\n${q.question}\n答案：${q.answer}\n解析：${q.analysis}`)
+        ].join('\n');
+        window.YTCopy(text);
+      };
+
+      window.exportHomework = function () {
+        if (!currentHomework) return;
+        const lines = [
+          `${currentHomework.topic} 作业`,
+          `难度：${currentHomework.difficulty}    题量：${currentHomework.count}题`,
+          '',
+          ...currentHomework.questions.map((q, i) => [
+            `${i + 1}.【${q.type}】${q.question}`,
+            `答案：${q.answer}`,
+            `解析：${q.analysis}`,
+            ''
+          ].join('\n'))
+        ];
+        window.YTDownload(lines.join('\n'), `${currentHomework.topic}_作业.txt`, 'text/plain;charset=utf-8');
+        window.YTToast('作业已导出');
+      };
+    })();
+  </script>
+</body>
+</html>

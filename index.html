@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>工作台 · 月瞳家教工作台</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body data-page="dashboard">
+  <!-- App Shell: Sidebar -->
+  <aside class="app-nav">
+    <div class="brand">
+      <div class="brand-icon" aria-hidden="true">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24"/><path d="m14.83 14.83 4.24 4.24"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">月瞳家教</div>
+        <div class="brand-subtitle">AI 家教工作台</div>
+      </div>
+    </div>
+    <nav class="nav-list" aria-label="主导航">
+      <a href="index.html" data-nav="dashboard"><span class="nav-icon" data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span class="nav-icon" data-icon="users"></span>学生档案</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span class="nav-icon" data-icon="book-open"></span>教案生成</a>
+      <a href="homework.html" data-nav="homework"><span class="nav-icon" data-icon="file-text"></span>作业生成</a>
+      <a href="report.html" data-nav="report"><span class="nav-icon" data-icon="trending-up"></span>学习报告</a>
+    </nav>
+    <div class="nav-footer">MVP v1.0 · 离线原型</div>
+  </aside>
+
+  <!-- App Shell: Bottom Nav (mobile) -->
+  <nav class="bottom-nav" aria-label="底部导航">
+    <div class="bottom-nav-inner">
+      <a href="index.html" data-nav="dashboard"><span data-icon="layout-dashboard"></span>工作台</a>
+      <a href="students.html" data-nav="students"><span data-icon="users"></span>学生</a>
+      <a href="lesson-plan.html" data-nav="lesson-plan"><span data-icon="book-open"></span>教案</a>
+      <a href="homework.html" data-nav="homework"><span data-icon="file-text"></span>作业</a>
+      <a href="report.html" data-nav="report"><span data-icon="trending-up"></span>报告</a>
+    </div>
+  </nav>
+
+  <main class="app-content">
+    <div class="container">
+      <header class="page-header animate-fade-up">
+        <div>
+          <h1 class="page-title">早安，老师</h1>
+          <p class="page-desc" id="today-date">今天是 2026年9月10日 星期四</p>
+        </div>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+          <button class="btn btn-ghost" onclick="showDisclaimer()"><span data-icon="bookmark"></span>使用说明</button>
+          <a href="students.html" class="btn btn-primary"><span data-icon="plus"></span>添加学生</a>
+        </div>
+      </header>
+
+      <section class="stat-grid animate-fade-up stagger-1" id="stat-cards">
+        <a href="students.html" class="card stat-card stat-card-clickable" title="查看学生档案">
+          <div class="stat-label">在教学生</div>
+          <div class="stat-value" id="stat-students">0</div>
+          <div class="stat-delta"><span data-icon="users"></span>查看全部学生</div>
+        </a>
+        <a href="students.html" class="card stat-card stat-card-clickable" title="查看课时记录">
+          <div class="stat-label">本周课时</div>
+          <div class="stat-value" id="stat-classes">0</div>
+          <div class="stat-delta"><span data-icon="clock"></span>查看课时记录</div>
+        </a>
+        <a href="lesson-plan.html" class="card stat-card stat-card-clickable" title="去备课">
+          <div class="stat-label">待备课</div>
+          <div class="stat-value" id="stat-plans">0</div>
+          <div class="stat-delta"><span data-icon="book-open"></span>去生成教案</div>
+        </a>
+        <a href="students.html" class="card stat-card stat-card-clickable" title="记录课后反馈">
+          <div class="stat-label">课后反馈</div>
+          <div class="stat-value" id="stat-feedbacks">0</div>
+          <div class="stat-delta"><span data-icon="message-circle"></span>去记录反馈</div>
+        </a>
+      </section>
+
+      <section class="animate-fade-up stagger-2 mb-24">
+        <h2 class="section-title"><span data-icon="sparkles"></span>快捷操作</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+          <a href="students.html" class="card card-hover" style="padding: 20px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--primary-soft); color: var(--primary); display: flex; align-items: center; justify-content: center;" data-icon="users"></div>
+            <div>
+              <div class="font-semibold">管理学生</div>
+              <div class="text-sub" style="font-size: 13px;">添加画像与课后反馈</div>
+            </div>
+          </a>
+          <a href="lesson-plan.html" class="card card-hover" style="padding: 20px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--success-soft); color: var(--success); display: flex; align-items: center; justify-content: center;" data-icon="book-open"></div>
+            <div>
+              <div class="font-semibold">生成教案</div>
+              <div class="text-sub" style="font-size: 13px;">AI 一键备课</div>
+            </div>
+          </a>
+          <a href="homework.html" class="card card-hover" style="padding: 20px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: var(--warning-soft); color: var(--warning); display: flex; align-items: center; justify-content: center;" data-icon="file-text"></div>
+            <div>
+              <div class="font-semibold">布置作业</div>
+              <div class="text-sub" style="font-size: 13px;">按知识点出题</div>
+            </div>
+          </a>
+          <a href="report.html" class="card card-hover" style="padding: 20px; display: flex; align-items: center; gap: 16px;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: #EEF2FF; color: #6366F1; display: flex; align-items: center; justify-content: center;" data-icon="trending-up"></div>
+            <div>
+              <div class="font-semibold">阶段报告</div>
+              <div class="text-sub" style="font-size: 13px;">汇总学习进展</div>
+            </div>
+          </a>
+        </div>
+      </section>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+        <section class="card animate-fade-up stagger-3" style="overflow: hidden;">
+          <div class="card-header">
+            <h2 class="card-title">最近课后反馈</h2>
+            <a href="students.html" class="text-primary font-medium" style="font-size: 13px;">查看全部</a>
+          </div>
+          <div class="card-body" id="recent-feedbacks">
+            <div class="empty-state" style="padding: 32px 16px;">
+              <div class="empty-icon" data-icon="message-circle"></div>
+              <div class="empty-title">暂无反馈</div>
+              <div class="empty-desc">在学生档案中记录课后反馈后，将在这里显示。</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card animate-fade-up stagger-4" style="overflow: hidden;">
+          <div class="card-header">
+            <h2 class="card-title">最近教案</h2>
+            <a href="lesson-plan.html" class="text-primary font-medium" style="font-size: 13px;">查看全部</a>
+          </div>
+          <div class="card-body" id="recent-plans">
+            <div class="empty-state" style="padding: 32px 16px;">
+              <div class="empty-icon" data-icon="book-open"></div>
+              <div class="empty-title">暂无教案</div>
+              <div class="empty-desc">使用 AI 教案生成器创建第一份教案。</div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <!-- 使用说明 / 免责声明弹窗 -->
+  <div class="overlay" id="disclaimer-modal">
+    <div class="modal" style="max-width: 560px;">
+      <div class="modal-header">
+        <h2 class="modal-title"><span data-icon="bookmark"></span>使用说明</h2>
+        <button class="close-btn" onclick="closeDisclaimer()" aria-label="关闭"><span data-icon="x"></span></button>
+      </div>
+      <div class="modal-body" style="line-height: 1.8;">
+        <div style="background: var(--warning-soft); border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 18px; color: var(--text);">
+          <strong>月瞳家教工作台是您的「备课助手」，不是替代您教学的工具。</strong>
+        </div>
+        <p style="margin-bottom: 14px; color: var(--text);">欢迎使用月瞳家教工作台。在开始使用前，请了解以下三点：</p>
+        <ol style="padding-left: 18px; margin-bottom: 18px; color: var(--text-sub);">
+          <li style="margin-bottom: 10px;"><strong style="color: var(--text);">辅助思路：</strong>平台通过 AI 帮您整理学生档案、搭建教案框架、生成练习题目和阶段报告，提供的是<strong>思路和参考</strong>。</li>
+          <li style="margin-bottom: 10px;"><strong style="color: var(--text);">AI 内容有局限：</strong>AI 生成的内容可能存在瑕疵、重复或同质化，不适合直接用于正式教学。建议您结合自身经验与学生实际情况进行修改。</li>
+          <li style="margin-bottom: 10px;"><strong style="color: var(--text);">可结合其他工具：</strong>思路搭建好后，您可以用 PPT、Word、WPS、思维导图等其他软件完成最终教案、课件或作业排版。</li>
+        </ol>
+        <p style="color: var(--text-sub); font-size: 13px;">点击「我已了解」即表示您理解以上内容，并同意将平台输出作为参考使用。</p>
+      </div>
+      <div class="modal-footer" style="justify-content: space-between;">
+        <label style="display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--text-sub); cursor: pointer;">
+          <input type="checkbox" id="disclaimer-agree"> 我已了解并同意
+        </label>
+        <button class="btn btn-primary" id="disclaimer-confirm" onclick="acceptDisclaimer()" disabled>开始使用</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="mock.js"></script>
+  <script src="api.js"></script>
+  <script src="app.js"></script>
+  <script>
+    (function () {
+      // Render inline icons
+      document.querySelectorAll('[data-icon]').forEach((el) => {
+        const name = el.dataset.icon;
+        const svg = window.YTIcon(name);
+        if (svg) el.innerHTML = svg;
+      });
+
+      // Today date
+      const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+      const d = new Date();
+      document.getElementById('today-date').textContent =
+        `今天是 ${d.getFullYear()}年${d.getMonth() + 1}月${d.getDate()}日 ${weekdays[d.getDay()]}`;
+
+      // Load stats
+      const students = window.YTData.DB.students;
+      const feedbacks = students.reduce((sum, s) => sum + s.feedbacks.length, 0);
+      const plans = window.YTData.DB.lessonPlans.length;
+      document.getElementById('stat-students').textContent = students.length;
+      document.getElementById('stat-classes').textContent = feedbacks + 2;
+      document.getElementById('stat-plans').textContent = plans + 2;
+      document.getElementById('stat-feedbacks').textContent = feedbacks;
+
+      // Recent feedbacks
+      const allFeedbacks = students.flatMap((s) => s.feedbacks.map((f) => ({ ...f, studentName: s.name }))).sort((a, b) => b.date.localeCompare(a.date));
+      const fbContainer = document.getElementById('recent-feedbacks');
+      if (allFeedbacks.length) {
+        fbContainer.innerHTML = allFeedbacks.slice(0, 4).map((f) => `
+          <div style="padding: 14px 0; border-bottom: 1px solid var(--divider);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+              <span class="font-semibold">${f.studentName}</span>
+              <span class="text-muted" style="font-size: 12px;">${f.date}</span>
+            </div>
+            <div class="text-sub" style="font-size: 13px; line-height: 1.5; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${f.content}</div>
+          </div>
+        `).join('');
+      }
+
+      // Recent lesson plans
+      const recentPlans = window.YTData.DB.lessonPlans.slice(0, 4);
+      const planContainer = document.getElementById('recent-plans');
+      if (recentPlans.length) {
+        planContainer.innerHTML = recentPlans.map((p) => `
+          <a href="lesson-plan.html?id=${p.id}" style="display: block; padding: 14px 0; border-bottom: 1px solid var(--divider);">
+            <div style="display: flex; justify-content: space-between; margin-bottom: 4px;">
+              <span class="font-semibold">${p.topic}</span>
+              <span class="text-muted" style="font-size: 12px;">${p.createdAt}</span>
+            </div>
+            <div class="text-sub" style="font-size: 13px;">${p.studentName} · ${p.objectives.slice(0, 30)}...</div>
+          </a>
+        `).join('');
+      }
+
+      // 使用说明弹窗
+      const agreeCheckbox = document.getElementById('disclaimer-agree');
+      const confirmBtn = document.getElementById('disclaimer-confirm');
+      agreeCheckbox.addEventListener('change', () => {
+        confirmBtn.disabled = !agreeCheckbox.checked;
+      });
+
+      window.showDisclaimer = function () {
+        agreeCheckbox.checked = false;
+        confirmBtn.disabled = true;
+        window.YTModal.open('#disclaimer-modal');
+      };
+
+      window.closeDisclaimer = function () {
+        window.YTModal.close('#disclaimer-modal');
+      };
+
+      window.acceptDisclaimer = function () {
+        if (!agreeCheckbox.checked) return;
+        localStorage.setItem('yuetong_seen_disclaimer', '1');
+        window.YTModal.close('#disclaimer-modal');
+      };
+
+      if (!localStorage.getItem('yuetong_seen_disclaimer')) {
+        window.showDisclaimer();
+      }
+    })();
+  </script>
+</body>
+</html>
