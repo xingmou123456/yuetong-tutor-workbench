@@ -192,8 +192,8 @@
       const feedbacks = students.reduce((sum, s) => sum + s.feedbacks.length, 0);
       const plans = window.YTData.DB.lessonPlans.length;
       document.getElementById('stat-students').textContent = students.length;
-      document.getElementById('stat-classes').textContent = feedbacks + 2;
-      document.getElementById('stat-plans').textContent = plans + 2;
+      document.getElementById('stat-classes').textContent = feedbacks;
+      document.getElementById('stat-plans').textContent = plans;
       document.getElementById('stat-feedbacks').textContent = feedbacks;
 
       // Recent feedbacks

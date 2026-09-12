@@ -1,7 +1,8 @@
 // mock.js — 月瞳家教工作台 MVP 假数据与本地存储封装
 
-const STORAGE_KEY = "yuetong_tutor_data_v1";
+const STORAGE_KEY = "yuetong_tutor_data_v2";
 
+// 演示用示例数据（保留参考，但新用户默认不加载）
 const DEFAULT_STUDENTS = [
   {
     id: "s1",
@@ -162,11 +163,12 @@ function loadData() {
   } catch (e) {
     console.warn("读取本地数据失败", e);
   }
+  // 新用户默认空白，方便从零开始录入自己的学生与内容
   return {
-    students: JSON.parse(JSON.stringify(DEFAULT_STUDENTS)),
-    lessonPlans: JSON.parse(JSON.stringify(DEFAULT_LESSON_PLANS)),
-    homeworks: JSON.parse(JSON.stringify(DEFAULT_HOMEWORKS)),
-    reports: JSON.parse(JSON.stringify(DEFAULT_REPORTS))
+    students: [],
+    lessonPlans: [],
+    homeworks: [],
+    reports: []
   };
 }
 
@@ -181,12 +183,7 @@ function saveData() {
 }
 
 function resetData() {
-  DB = {
-    students: JSON.parse(JSON.stringify(DEFAULT_STUDENTS)),
-    lessonPlans: JSON.parse(JSON.stringify(DEFAULT_LESSON_PLANS)),
-    homeworks: JSON.parse(JSON.stringify(DEFAULT_HOMEWORKS)),
-    reports: JSON.parse(JSON.stringify(DEFAULT_REPORTS))
-  };
+  DB = { students: [], lessonPlans: [], homeworks: [], reports: [] };
   saveData();
 }
 
